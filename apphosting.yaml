@@ -1,0 +1,4 @@
+# Sirve el contenido estático de la carpeta /public
+static_backend:
+  # El directorio raíz debe coincidir con la configuración de tu consola de Firebase
+  static_dir: /public
