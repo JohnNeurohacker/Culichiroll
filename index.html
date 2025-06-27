@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Culichiroll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f7fafc;
+        }
+        .modal-bg {
+            background-color: rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen bg-gray-100">
+        <!-- Barra Lateral de Navegación -->
+        <div class="w-64 bg-gray-800 text-white flex flex-col">
+            <div class="px-8 py-6 border-b border-gray-700">
+                <h1 class="text-2xl font-bold">Culichiroll</h1>
+                <p class="text-sm text-gray-400">Panel de Admin</p>
+            </div>
+            <nav class="flex-grow">
+                <a href="#" class="flex items-center px-8 py-4 bg-gray-700">
+                    <i data-lucide="book-open" class="w-5 h-5 mr-3"></i>
+                    <span>Gestión de Menú</span>
+                </a>
+                <a href="#" class="flex items-center px-8 py-4 hover:bg-gray-700">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>
+                    <span>Pedidos</span>
+                </a>
+                <a href="#" class="flex items-center px-8 py-4 hover:bg-gray-700">
+                    <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+                    <span>Clientes</span>
+                </a>
+                <a href="#" class="flex items-center px-8 py-4 hover:bg-gray-700">
+                    <i data-lucide="percent" class="w-5 h-5 mr-3"></i>
+                    <span>Promociones</span>
+                </a>
+            </nav>
+            <div class="px-8 py-4 border-t border-gray-700">
+                 <a href="#" class="flex items-center hover:text-red-400">
+                    <i data-lucide="log-out" class="w-5 h-5 mr-3"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="flex-grow p-10 overflow-y-auto">
+            <header class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-extrabold text-gray-800">Gestión de Menú</h2>
+                <button id="add-product-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg flex items-center shadow-lg hover:bg-red-700 transition-transform transform hover:scale-105">
+                    <i data-lucide="plus" class="w-5 h-5 mr-2"></i>
+                    Añadir Platillo
+                </button>
+            </header>
+
+            <!-- Tabla de Productos -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                        <tr>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Platillo</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Categoría</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Precio</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estatus</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-50"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body">
+                        <!-- Las filas de productos se insertarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Añadir/Editar Producto -->
+    <div id="product-modal" class="hidden fixed inset-0 modal-bg flex justify-center items-center">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-2xl">
+            <h3 id="modal-title" class="text-2xl font-bold mb-6 text-gray-800">Añadir Nuevo Platillo</h3>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nombre del Platillo</label>
+                        <input type="text" id="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700">Categoría</label>
+                        <input type="text" id="category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="price" class="block text-sm font-medium text-gray-700">Precio</label>
+                        <input type="number" step="0.01" id="price" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                    </div>
+                     <div>
+                        <label for="isAvailable" class="block text-sm font-medium text-gray-700">Estatus</label>
+                        <select id="isAvailable" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                            <option value="true">Disponible</option>
+                            <option value="false">Agotado</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="description" class="block text-sm font-medium text-gray-700">Descripción</label>
+                        <textarea id="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="imageUrl" class="block text-sm font-medium text-gray-700">URL de la Imagen</label>
+                        <input type="text" id="imageUrl" placeholder="https://ejemplo.com/imagen.jpg" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end space-x-4">
+                    <button type="button" id="cancel-btn" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300">Cancelar</button>
+                    <button type="submit" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">Guardar Platillo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import functions from the Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase configuration injected
+        const firebaseConfig = {
+            apiKey: "AIzaSyCAXmryUa3yRJTVfGcy_aFTXSNwnwubs68",
+            authDomain: "culichiroll-db385.firebaseapp.com",
+            projectId: "culichiroll-db385",
+            storageBucket: "culichiroll-db385.appspot.com",
+            messagingSenderId: "739635490941",
+            appId: "1:739635490941:web:76043d9fdbf4ac04214114",
+            measurementId: "G-H46N9Z8MV9"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const productsTableBody = document.getElementById('products-table-body');
+        const addProductBtn = document.getElementById('add-product-btn');
+        const productModal = document.getElementById('product-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const productForm = document.getElementById('product-form');
+        const cancelBtn = document.getElementById('cancel-btn');
+        
+        // Form fields
+        const productIdField = document.getElementById('product-id');
+        const nameField = document.getElementById('name');
+        const categoryField = document.getElementById('category');
+        const priceField = document.getElementById('price');
+        const isAvailableField = document.getElementById('isAvailable');
+        const descriptionField = document.getElementById('description');
+        const imageUrlField = document.getElementById('imageUrl');
+
+
+        // --- Functions ---
+
+        const openModal = (product = null) => {
+            productForm.reset();
+            if (product) {
+                // Editing an existing product
+                modalTitle.textContent = 'Editar Platillo';
+                productIdField.value = product.id;
+                nameField.value = product.name;
+                categoryField.value = product.category;
+                priceField.value = product.price;
+                isAvailableField.value = product.isAvailable;
+                descriptionField.value = product.description;
+                imageUrlField.value = product.imageUrl;
+            } else {
+                // Adding a new product
+                modalTitle.textContent = 'Añadir Nuevo Platillo';
+                productIdField.value = '';
+            }
+            productModal.classList.remove('hidden');
+        };
+
+        const closeModal = () => {
+            productModal.classList.add('hidden');
+        };
+        
+        // --- Real-time data listener ---
+        
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            let productsHTML = '';
+            snapshot.forEach(doc => {
+                const product = { id: doc.id, ...doc.data() };
+                const availabilityClass = product.isAvailable ? 'text-green-900 bg-green-200' : 'text-red-900 bg-red-200';
+                const availabilityText = product.isAvailable ? 'Disponible' : 'Agotado';
+
+                productsHTML += `
+                    <tr>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 w-16 h-16">
+                                    <img class="w-full h-full rounded-md object-cover" src="${product.imageUrl || 'https://placehold.co/100x100/cccccc/ffffff?text=Sin+Imagen'}" alt="Imagen de ${product.name}" />
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-gray-900 font-semibold whitespace-no-wrap">${product.name}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">${product.category}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 font-bold whitespace-no-wrap">$${parseFloat(product.price).toFixed(2)}</p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <span class="relative inline-block px-3 py-1 font-semibold leading-tight ${availabilityClass}">
+                                <span aria-hidden class="absolute inset-0 opacity-50 rounded-full"></span>
+                                <span class="relative">${availabilityText}</span>
+                            </span>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-right">
+                            <button class="edit-btn text-gray-500 hover:text-indigo-600 p-2" data-id="${product.id}">
+                                <i data-lucide="edit-3" class="w-5 h-5 pointer-events-none"></i>
+                            </button>
+                            <button class="delete-btn text-gray-500 hover:text-red-600 p-2" data-id="${product.id}">
+                                <i data-lucide="trash-2" class="w-5 h-5 pointer-events-none"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            productsTableBody.innerHTML = productsHTML;
+            lucide.createIcons(); // Re-render icons after updating the DOM
+        });
+        
+        // --- Event Listeners ---
+        
+        addProductBtn.addEventListener('click', () => openModal());
+        cancelBtn.addEventListener('click', closeModal);
+
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productId = productIdField.value;
+            const productData = {
+                name: nameField.value,
+                category: categoryField.value,
+                price: parseFloat(priceField.value),
+                isAvailable: isAvailableField.value === 'true',
+                description: descriptionField.value,
+                imageUrl: imageUrlField.value
+            };
+
+            try {
+                if (productId) {
+                    // Update existing document
+                    const docRef = doc(db, "products", productId);
+                    await updateDoc(docRef, productData);
+                } else {
+                    // Create new document
+                    await addDoc(collection(db, "products"), productData);
+                }
+                closeModal();
+            } catch (error) {
+                console.error("Error saving document: ", error);
+                alert("Hubo un error al guardar el platillo.");
+            }
+        });
+
+        productsTableBody.addEventListener('click', async (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const id = target.dataset.id;
+            
+            if (target.classList.contains('edit-btn')) {
+                const docRef = doc(db, "products", id);
+                const docSnap = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js").then(mod => mod.getDoc(docRef));
+                if (docSnap.exists()) {
+                    openModal({ id: docSnap.id, ...docSnap.data() });
+                }
+            }
+            
+            if (target.classList.contains('delete-btn')) {
+                if (confirm('¿Estás seguro de que quieres eliminar este platillo?')) {
+                    try {
+                        await deleteDoc(doc(db, "products", id));
+                    } catch (error) {
+                         console.error("Error deleting document: ", error);
+                         alert("Hubo un error al eliminar el platillo.");
+                    }
+                }
+            }
+        });
+
+        // Initial icon rendering
+        lucide.createIcons();
+    </script>
+</body>
+</html>
